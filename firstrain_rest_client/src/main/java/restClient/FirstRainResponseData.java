@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FirstRainResponseData {
     FirstRainResponseFr fr;
-    FirstTainResponseEntityMap entityMap;
+    FirstRainResponseEntityMap entityMap;
 
     public FirstRainResponseData() {
     }
@@ -21,11 +21,11 @@ public class FirstRainResponseData {
         return fr;
     }
 
-    public FirstTainResponseEntityMap getEntityMap() {
+    public FirstRainResponseEntityMap getEntityMap() {
         return entityMap;
     }
 
-    public void setEntityMap(FirstTainResponseEntityMap entityMap) {
+    public void setEntityMap(FirstRainResponseEntityMap entityMap) {
         this.entityMap = entityMap;
     }
 

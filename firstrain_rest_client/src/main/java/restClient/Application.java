@@ -70,7 +70,7 @@ public class Application {
                     }
                 }
             }
-            log.info("Total Documents: [" + docCompany.size() + "]");
+            log.info("Total Documents with Company Info: [" + docCompany.size() + "]");
             log.info(docCompany.toString());
             log.info("Total Companies: [" + companySet.size() + "]");
             log.info(companySet.toString());

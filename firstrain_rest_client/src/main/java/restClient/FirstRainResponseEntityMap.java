@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 
-public class FirstTainResponseEntityMap {
+public class FirstRainResponseEntityMap {
     private String website;
 
     public String getWebsite() {
