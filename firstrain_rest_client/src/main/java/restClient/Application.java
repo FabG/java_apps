@@ -7,10 +7,9 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -24,7 +23,17 @@ public class Application {
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(Application.class);
 
     public static void main(String args[]) {
-        final String baseURI  = "https://api.firstrain.com/standard/v1/monitor/M:548853/brief";
+        Properties prop = new Properties();
+        InputStream config = null;
+
+        try {
+            config = new FileInputStream("src/resources/development.properties");
+            prop.load(config);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        final String baseURI  = prop.getProperty("baseURI");
 
         UriComponentsBuilder builder = UriComponentsBuilder
                 .fromHttpUrl(baseURI)
@@ -34,9 +43,9 @@ public class Application {
         URI uri = builder.build().toUri();
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("frUserId", "U:4733821");
+        headers.add("frUserId", prop.getProperty("frUserId"));
+        headers.add("authKey", prop.getProperty("authKey"));
         headers.add("Accept", "application/json");
-        headers.add("authKey", "f1ea689a73fe233decf6ea9fd70d8b97dfd548e7a4d32954d1cbec861505939c");
 
         RestTemplate firstRainRest = new RestTemplate();
         try {
@@ -109,7 +118,9 @@ public class Application {
             log.info(companyWebsite.toString());
 
             // Write to CSV file
-            String fileName = "firstrain_company_website" + new Date().getTime() + ".csv";
+            Date date = new Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+            String fileName = "firstrain_company_website_" + dateFormat.format(date) + ".csv";
             String eol = System.getProperty("line.separator");
 
             try (Writer writer = new FileWriter(fileName)) {
