@@ -1,7 +1,12 @@
 package com.circleback.utility;
 
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.univocity.parsers.tsv.TsvParser;
+import com.univocity.parsers.tsv.TsvParserSettings;
 import org.xbill.DNS.Lookup;
 import org.xbill.DNS.MXRecord;
 import org.xbill.DNS.Record;
@@ -13,6 +18,8 @@ import org.xbill.DNS.Type;
  * Created by Fab on 6/15/17.
  */
 public class MXLookup {
+
+    List<String> ispList = new ArrayList<String>();
 
     /* Method to check what Email Server is hosting an email domain: Google (GoogleApps+gmail), Exchange Server, Exchange Online */
     public String checkMXRecords(String domain) {
@@ -57,4 +64,28 @@ public class MXLookup {
         return "Unknown";
 
     }
+
+
+    public void loadISPFile(String fileISP) {
+        try {
+            TsvParserSettings ispSettings = new TsvParserSettings();
+            TsvParser ispParser = new TsvParser(ispSettings);
+
+            // parses all rows in one go.
+            List<String[]> ispListArray = ispParser.parseAll(new FileReader(fileISP));
+
+            for (String[] isp : ispListArray) this.ispList.add(isp[0]);
+
+
+        }  catch (IOException e) {
+            System.err.println("Error parsing ISP file: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+
+    public Boolean checkISP(String domain) {
+            return this.ispList.contains(domain);
+    }
+
 }

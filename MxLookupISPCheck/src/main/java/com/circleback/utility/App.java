@@ -1,10 +1,9 @@
 package com.circleback.utility;
 
-import java.io.File;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Properties;
 
 /**
@@ -23,18 +22,23 @@ public class App {
             ex.printStackTrace();
         }
 
-        if (args.length != 1) {
+        if (args.length != 2) {
             System.out.println("Please run this jar with a TSV file as argument");
-            System.out.println("Usage: > $ java -jar target/MXLookup-1.0.jar <inputfile.tsv>");
+            System.out.println("Usage: $ java -jar target/MXLookup-1.0.jar <inputFile.tsv> <outputFileName>");
             System.exit(1);
         }
 
+        // Input File
         String inputFile = args[0];
         System.out.println("inputFile: " + inputFile );
 
+        // Output file
+        String outputFile = args[1];
+        System.out.println("outputFile: " + outputFile );
+
 
         Utils utils = new Utils();
-        utils.parseTSVFile(inputFile);
+        utils.parseTSVFile(inputFile, outputFile);
 
     }
 }

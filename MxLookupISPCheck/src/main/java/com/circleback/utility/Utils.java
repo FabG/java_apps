@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class Utils {
 
-    public void parseTSVFile(String tsvFile) {
+    public void parseTSVFile(String tsvFile, String outputFile) {
         int emailDomainPosition = 0;
         int headerCount = 0;
         int iter = 0;
@@ -31,14 +31,13 @@ public class Utils {
             System.out.println("Trying to find the field position of 'email_domain' in the header...");
 
             for (String headerField : headerRow) {
-                System.out.println(" - position: " + iter + " / header value: " + headerField );
+                //System.out.println(" - position: " + iter + " / header value: " + headerField );
                 if (headerField.equals("email_domain")) {
                     emailDomainPosition = iter;
                     System.out.println(" => found email_domain => position: " + emailDomainPosition);
                     break;
                 }
 
-                //System.out.println("  - current position: " + iter + " Vs total header count: " + headerCount);
                 if (iter != headerCount)
                     iter++;
                 else {
@@ -48,7 +47,7 @@ public class Utils {
             }
 
             // Add 2 more headers to the header: is_isp and email_domain_mxtype
-            FileWriter writer = new FileWriter("output.tsv");
+            FileWriter writer = new FileWriter(outputFile);
             for (String out : headerRow) {
                 writer.write(out+"\t");
             }
@@ -60,54 +59,39 @@ public class Utils {
             String domain = null;
             String mxType = null;
 
-            try {
-                TsvParserSettings ispSettings = new TsvParserSettings();
-                TsvParser ispParser = new TsvParser(ispSettings);
+            mxlookup.loadISPFile("src/main/resources/ISPDomains.tsv");
 
-                // parses all rows in one go.
-                List<String[]> ispListArray = ispParser.parseAll(new FileReader("src/main/resources/ISPDomains.tsv"));
+            // iterate over row #2 till end of file and try each email domain
+            System.out.println("Looping through each row and running the email Domain through ISP and MXLookup check...");
+            for (String[] row : allTSVRows.subList(1, allTSVRows.size())) {
 
-                List<String> ispList = new ArrayList<String>();
-                for (String[] isp : ispListArray) ispList.add(isp[0]);
-
-                // iterate over row #2 till end of file and try each email domain
-                System.out.println("Looping through each row and running the email Domain through ISP and MXLookup check...");
-                for (String[] row : allTSVRows.subList(1, allTSVRows.size())) {
-
-                    List<String> outputList = new ArrayList<String>();
-                    for (int i = 0; i < row.length; i++) {
-                        outputList.add(row[i]);
-                    }
-
-                    domain = row[emailDomainPosition].toString();
-
-                    // ISP Check
-                    isISP = ispList.contains(domain);
-
-                    //MXLookup check
-                    mxType = mxlookup.checkMXRecords(domain);
-                    System.out.println("mxType: [" + mxType + "] / is ISP?: [" + isISP + "]");
-
-                    for (String out : outputList) System.out.println("out: " + out);
-
-                    // Add to List
-                    outputList.add(isISP.toString());
-                    outputList.add(mxType);
-
-                    // write data
-                    for (String out : outputList) {
-                        writer.write(out+"\t");
-                    }
-                    writer.write("\n");
-
+                List<String> outputList = new ArrayList<String>();
+                for (int i = 0; i < row.length; i++) {
+                    outputList.add(row[i]);
                 }
-                writer.close();
 
+                domain = row[emailDomainPosition].toString();
 
-            } catch (IOException e) {
-                System.err.println("Error parsing ISP file: " + e.getMessage());
-                e.printStackTrace();
+                // ISP Check
+                isISP = mxlookup.checkISP(domain);
+
+                //MXLookup check
+                mxType = mxlookup.checkMXRecords(domain);
+                System.out.println("Domain: [" + domain + "] -> mxType: [" + mxType + "] / is ISP: [" + isISP + "]");
+                //for (String out : outputList) System.out.println("out: " + out);
+
+                // Add to List
+                outputList.add(isISP.toString());
+                outputList.add(mxType);
+
+                // write data
+                for (String out : outputList) {
+                    writer.write(out+"\t");
+                }
+                writer.write("\n");
+
             }
+            writer.close();
 
 
         } catch (IOException e) {
