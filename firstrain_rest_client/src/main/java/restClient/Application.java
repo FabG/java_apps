@@ -27,7 +27,7 @@ public class Application {
         InputStream config = null;
 
         try {
-            config = new FileInputStream("src/resources/development.properties");
+            config = new FileInputStream("src/resources/development.properties");`
             prop.load(config);
         } catch (IOException ex) {
             ex.printStackTrace();
