@@ -31,7 +31,6 @@ public class Utils {
             System.out.println("Trying to find the field position of 'email_domain' in the header...");
 
             for (String headerField : headerRow) {
-                //System.out.println(" - position: " + iter + " / header value: " + headerField );
                 if (headerField.equals("email_domain")) {
                     emailDomainPosition = iter;
                     System.out.println(" => found email_domain => position: " + emailDomainPosition);
@@ -77,8 +76,7 @@ public class Utils {
 
                 //MXLookup check
                 mxType = mxlookup.checkMXRecords(domain);
-                System.out.println("Domain: [" + domain + "] -> mxType: [" + mxType + "] / is ISP: [" + isISP + "]");
-                //for (String out : outputList) System.out.println("out: " + out);
+                //System.out.println("Domain: [" + domain + "] -> mxType: [" + mxType + "] / is ISP: [" + isISP + "]");
 
                 // Add to List
                 outputList.add(isISP.toString());

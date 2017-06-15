@@ -24,7 +24,7 @@ public class App {
 
         if (args.length != 2) {
             System.out.println("Please run this jar with a TSV file as argument");
-            System.out.println("Usage: $ java -jar target/MXLookup-1.0.jar <inputFile.tsv> <outputFileName>");
+            System.out.println("Usage: $  java -jar target/MXLookup-1.0-ALL.jar <inputFile.tsv> <outputFileName>");
             System.exit(1);
         }
 
