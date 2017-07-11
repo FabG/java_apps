@@ -27,7 +27,7 @@ public class Application {
         InputStream config = null;
 
         try {
-            config = new FileInputStream("src/resources/development.properties");`
+            config = new FileInputStream("src/resources/development.properties");
             prop.load(config);
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -91,12 +91,12 @@ public class Application {
 
             for (String company:companySet
                     ) {
-                final String uriCompany  = "https://api.firstrain.com/standard/v1/entity/C:" + company + "/map";
+                final String companyURI  = prop.getProperty("companyURI") + company + "/map";
                 //sum += 1;
                 //if (sum == 4) break;
 
                 UriComponentsBuilder builderCompany = UriComponentsBuilder
-                        .fromHttpUrl(uriCompany);
+                        .fromHttpUrl(companyURI);
                 URI uriC = builderCompany.build().toUri();
                 RestTemplate firstRainRestC = new RestTemplate();
                 try {
