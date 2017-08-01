@@ -15,9 +15,11 @@ public class FirstRainResponseDocs {
     private String contentType;
     private String timeStamp;
     private FirstRainResponseSource source;
-    private String urlLink;
+    private String link;
     private String title;
     private String groupId;
+    private String snippet;
+    private String quotes;
     private List<FirstRainResponseEntity> entity;
 
     public String getId() {
@@ -52,12 +54,12 @@ public class FirstRainResponseDocs {
         this.source = source;
     }
 
-    public String getUrlLink() {
-        return urlLink;
+    public String getLink() {
+        return link;
     }
 
-    public void setUrlLink(String urlLink) {
-        this.urlLink = urlLink;
+    public void setLink(String link) {
+        this.link = link;
     }
 
     public String getTitle() {
@@ -84,12 +86,33 @@ public class FirstRainResponseDocs {
         this.entity = entity;
     }
 
+    public String getSnippet() {
+        if (snippet != null)
+            return snippet.substring(1,50);
+        else
+            return null;
+    }
+
+    public void setSnippet(String snippet) {
+        this.snippet = snippet;
+    }
+
+    public String getQuotes() {
+        return quotes;
+    }
+
+    public void setQuotes(String quotes) {
+        this.quotes = quotes;
+    }
+
     @Override
     public String toString() {
         return "{id=" + id +
                 ", entity=" + entity +
                 ", timeStamp='" + timeStamp +
                 ", groupId=" + groupId +
+                ", snippet=" + snippet +
+                ", quotes=" + quotes +
                 "}";
     }
 }

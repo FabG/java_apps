@@ -37,7 +37,7 @@ public class Application {
 
         UriComponentsBuilder builder = UriComponentsBuilder
                 .fromHttpUrl(baseURI)
-                .queryParam("sections", "{fr}")
+                .queryParam("sections", "{fr(ic:100,io:0)}")
                 .queryParam("results", "{D}")
                 .queryParam("entitylinks", true);
         URI uri = builder.build().toUri();
@@ -65,24 +65,48 @@ public class Application {
             // Can also store as a set the unique companies
             Set<String> companySet = new HashSet<String>();
 
-            for (FirstRainResponseDocs document:response.getBody().getResult().getData().getFr().getDocuments()
-                 ) {
-                docCompany.put(document.getId().toString(), new LinkedList<String>());
-                //log.info("DocumentId: " + document.getId() + "\t\t" + "contentType: [" + document.getContentType() + "] \t\timeStamp: [" + document.getTimeStamp() + "]");
-                for (FirstRainResponseEntity entity:document.getEntity()
+            // Write to TSV file each document with the required fields for FaceBook POC: ID, link, quotes, snippet,....
+            Date date = new Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+            String fileName = "firstrain_article_info_" + dateFormat.format(date) + ".tsv";
+            String eol = System.getProperty("line.separator");
+
+            try (Writer writer = new FileWriter(fileName)) {
+                writer.append("FirstRainID\tsourceName\tsourceSearchToken\tlink\ttitle\tquotes\t[FirstRainCompanies]").append(eol);
+
+                for (FirstRainResponseDocs document:response.getBody().getResult().getData().getFr().getDocuments()
                      ) {
-                    if (entity.getSearchToken().startsWith("C:")) {
-                        String company = entity.getSearchToken().toString().substring(2);
-                        docCompany.get(document.getId()).add(company);
-                        companySet.add(company);
-                        //log.info("==> CompanyId: " + entity.getSearchToken().toString().substring(2));
+                    docCompany.put(document.getId().toString(), new LinkedList<String>());
+                    writer.append(document.getId().toString()).append("\t").
+                            append(document.getSource().getName()).append("\t").
+                            append(document.getSource().getSearchToken()).append("\t").
+                            append(document.getLink()).append("\t").
+                            append(document.getTitle()).append("\t").
+                            //append(document.getSnippet()).append("\t").
+                            append(document.getQuotes()).append("\t");
+
+                    //log.info("DocumentId: " + document.getId() + "\t\t" + "contentType: [" + document.getContentType() + "] \t\timeStamp: [" + document.getTimeStamp() + "]");
+                    for (FirstRainResponseEntity entity:document.getEntity()
+                         ) {
+                        if (entity.getSearchToken().startsWith("C:")) {
+                            String company = entity.getSearchToken().toString().substring(2);
+                            docCompany.get(document.getId()).add(company);
+                            companySet.add(company);
+                            //log.info("==> CompanyId: " + entity.getSearchToken().toString().substring(2));
+                        }
                     }
+                    // Add to TSV files the companies if any is part of the document/article
+                    writer.append(companySet.toString()).append(eol);
                 }
+            } catch (IOException ex) {
+                ex.printStackTrace(System.err);
             }
-            log.info("Total Documents with Company Info: [" + docCompany.size() + "]");
+            log.info("Total Documents: [" + docCompany.size() + "]");
             log.info(docCompany.toString());
             log.info("Total Companies: [" + companySet.size() + "]");
             log.info(companySet.toString());
+
+
 
             // For each Company, issue a 2nd REST request to get the web url
             //int sum = 0;
@@ -117,18 +141,19 @@ public class Application {
             log.info("Total Companies + Website: [" + companyWebsite.size() + "]");
             log.info(companyWebsite.toString());
 
-            // Write to CSV file
-            Date date = new Date();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-            String fileName = "firstrain_company_website_" + dateFormat.format(date) + ".csv";
-            String eol = System.getProperty("line.separator");
+            // Write to TSV file
+            //Date date = new Date();
+            //SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+            String fileName2 = "firstrain_company_website_" + dateFormat.format(date) + ".tsv";
+            String eol2 = System.getProperty("line.separator");
 
-            try (Writer writer = new FileWriter(fileName)) {
+            try (Writer writer = new FileWriter(fileName2)) {
+                writer.append("FirstRainCompany\turl").append(eol);
                 for (Map.Entry<String, String> entry : companyWebsite.entrySet()) {
                     writer.append(entry.getKey())
-                            .append(',')
+                            .append('\t')
                             .append(entry.getValue())
-                            .append(eol);
+                            .append(eol2);
                 }
             } catch (IOException ex) {
                 ex.printStackTrace(System.err);
